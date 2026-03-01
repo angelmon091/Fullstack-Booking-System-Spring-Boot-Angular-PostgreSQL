@@ -1,0 +1,122 @@
+---
+description: 
+alwaysApply: true
+---
+
+# Spring Boot & Java 25 Standards
+
+## Project Structure
+
+Follow this layout under `backend/reservation-code/src/main/java/com/devsenior/angelmon091/reservation_code/`:
+
+```
+reservation_code/
+├── BackendReservasApplication.java     # Main application
+├── config/                             # @Configuration beans (security, CORS, etc.)
+├── controller/                         # REST @RestController
+├── service/                            # Business logic @Service
+├── repository/                         # Spring Data JPA @Repository
+├── entity/                             # JPA @Entity (domain model)
+├── dto/                                # Request/Response records
+│   ├── request/                        # Incoming DTOs
+│   └── response/                       # Outgoing DTOs
+├── exception/                          # Global @ControllerAdvice, custom exceptions
+└── util/                               # Shared utilities (optional)
+```
+
+Tests mirror `src/main/java` under `src/test/java` with same package.
+
+## Naming (English Only)
+
+- **Classes, interfaces, records**: PascalCase (e.g. `ReservationService`, `CreateReservationRequest`).
+- **Methods and attributes**: camelCase (e.g. `findById`, `customerName`).
+- **Constants**: UPPER_SNAKE_CASE (e.g. `MAX_PAGE_SIZE`).
+- All identifiers must be in English.
+
+## Javadoc for Public API
+
+Every **public** method (controllers, services, repositories if custom) must have Javadoc:
+
+```java
+/**
+ * Finds a reservation by its unique identifier.
+ *
+ * @param id the reservation ID (must not be null)
+ * @return the reservation if found
+ * @throws EntityNotFoundException if no reservation exists for the given id
+ */
+public Optional<Reservation> findById(UUID id) {
+    return repository.findById(id);
+}
+```
+
+Include `@param`, `@return`, and `@throws` when applicable. Keep descriptions concise and in English.
+
+## DTOs as Java Records
+
+Use **records** for all DTOs (request/response). Prefer immutability and validation.
+
+```java
+// dto/request/CreateReservationRequest.java
+package com.devsenior.angelmon091.reservation_code.dto.request;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Future;
+
+/**
+ * Request body for creating a new reservation.
+ */
+public record CreateReservationRequest(
+    @NotNull String customerName,
+    @NotNull @Future java.time.Instant startTime,
+    @NotNull java.util.UUID resourceId
+) {}
+```
+
+```java
+// dto/response/ReservationResponse.java
+package com.devsenior.angelmon091.reservation_code.dto.response;
+
+import java.time.Instant;
+import java.util.UUID;
+
+/**
+ * Response payload for a single reservation.
+ */
+public record ReservationResponse(
+    UUID id,
+    String customerName,
+    Instant startTime,
+    UUID resourceId,
+    String status
+) {}
+```
+
+- Place request DTOs in `dto.request`, response DTOs in `dto.response`.
+- Document the record’s purpose with a short Javadoc above the record.
+
+## Java 25 Practices
+
+- **Records**: Use for DTOs and small value types; avoid mutable DTOs.
+- **Pattern matching**: Prefer `instanceof` pattern and switch pattern matching where it simplifies code.
+- **Sealed types** (if applicable): Use for restricted hierarchies (e.g. result/error types).
+- **Text blocks**: Use `"""..."""` for multi-line strings (SQL snippets, JSON examples in tests).
+- **var**: Use only when the type is obvious from the right-hand side; keep readability.
+- Prefer `Optional` for optional returns; avoid null for public API when possible.
+
+## Spring Boot Conventions
+
+- **Controllers**: Thin layer; validate input with `@Valid`, return DTOs, delegate to services. Document each endpoint (Javadoc or OpenAPI).
+- **Services**: `@Transactional` at service layer where a single transaction is needed; use read-only transactions for queries when appropriate.
+- **Repositories**: Prefer Spring Data JPA method names or `@Query`; keep custom logic in services.
+- **Entities**: Use `@Entity` in `entity/`; avoid exposing entities in REST API—map to DTOs.
+- **Exceptions**: Use `@ControllerAdvice` and custom exceptions in `exception/`; return consistent error payloads (e.g. `ErrorResponse` record).
+- **Configuration**: Externalize environment-specific values to `application.properties` / `application-*.properties`; use `@ConfigurationProperties` for grouped config.
+
+## Checklist
+
+- [ ] All names (classes, methods, attributes) in English.
+- [ ] Every public method has Javadoc with `@param` / `@return` / `@throws` as needed.
+- [ ] DTOs are Java records in `dto.request` and `dto.response`.
+- [ ] New code follows the defined package structure.
+- [ ] Controllers return DTOs; services work with entities and DTOs as appropriate.
