@@ -1,0 +1,128 @@
+/* Design system: modern Spotify/Facebook-inspired theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Brand & surfaces */
+  --color-bg: #f0f2f5;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-nav: #1a1a2e;
+  --color-nav-hover: #252542;
+  --color-nav-active: #16213e;
+
+  /* Text */
+  --color-text: #1c1e21;
+  --color-text-secondary: #65676b;
+  --color-text-on-nav: #e4e6eb;
+  --color-text-on-primary: #ffffff;
+
+  /* Primary (accent) - green Spotify-like */
+  --color-primary: #1db954;
+  --color-primary-hover: #1ed760;
+  --color-primary-focus: #1db954;
+
+  /* Semantic */
+  --color-error: #e74c3c;
+  --color-error-bg: #fde8e8;
+  --color-success: #27ae60;
+  --color-success-bg: #e8f8f0;
+  --color-border: #dddfe2;
+  --color-border-light: #e4e6eb;
+
+  /* Shadows & radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.1);
+
+  /* Spacing */
+  --space-page: clamp(1rem, 4vw, 2rem);
+  --header-height: 56px;
+  --max-content: 1200px;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+  min-height: 100vh;
+}
+
+/* Skip link for keyboard users (a11y) */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-page);
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: var(--color-text-on-primary);
+  background: var(--color-primary);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 1rem;
+  outline: 2px solid var(--color-text-on-primary);
+  outline-offset: 2px;
+}
+
+/* Focus visible for all focusable elements */
+:focus-visible {
+  outline: 2px solid var(--color-primary-focus);
+  outline-offset: 2px;
+}
+
+/* Minimum touch target (44px) for buttons and controls on touch devices (WCAG 2.5.5) */
+@media (pointer: coarse) {
+  button,
+  input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  select,
+  [role="button"] {
+    min-height: 44px;
+  }
+  button, [role="button"] {
+    min-width: 44px;
+  }
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}

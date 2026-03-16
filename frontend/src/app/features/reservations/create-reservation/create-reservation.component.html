@@ -1,0 +1,124 @@
+<section class="create-reservation" aria-labelledby="create-reservation-heading">
+  <h1 id="create-reservation-heading" class="create-reservation__title">
+    Nueva reserva
+  </h1>
+
+  <app-toast
+    [message]="toastMessage()"
+    type="error"
+    (dismissed)="onToastDismiss()"
+  />
+
+  <form
+    class="create-reservation__form"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    aria-describedby="form-instructions"
+  >
+    <p id="form-instructions" class="create-reservation__hint">
+      Todos los campos son obligatorios.
+    </p>
+
+    <div class="create-reservation__field">
+      <label for="customerName" class="create-reservation__label">
+        Nombre del cliente
+      </label>
+      <input
+        id="customerName"
+        type="text"
+        class="create-reservation__input"
+        formControlName="customerName"
+        autocomplete="name"
+        [attr.aria-required]="true"
+        [attr.aria-invalid]="form.controls.customerName.invalid && form.controls.customerName.touched"
+        [attr.aria-describedby]="form.controls.customerName.invalid && form.controls.customerName.touched ? 'customerName-error' : null"
+      />
+      @if (form.controls.customerName.invalid && form.controls.customerName.touched) {
+        <p id="customerName-error" class="create-reservation__error" role="alert">
+          El nombre del cliente es obligatorio.
+        </p>
+      }
+    </div>
+
+    <div class="create-reservation__field">
+      <label for="date" class="create-reservation__label">
+        Fecha
+      </label>
+      <input
+        id="date"
+        type="date"
+        class="create-reservation__input"
+        formControlName="date"
+        [attr.aria-required]="true"
+        [attr.aria-invalid]="form.controls.date.invalid && form.controls.date.touched"
+        [attr.aria-describedby]="form.controls.date.invalid && form.controls.date.touched ? 'date-error' : null"
+      />
+      @if (form.controls.date.invalid && form.controls.date.touched) {
+        <p id="date-error" class="create-reservation__error" role="alert">
+          La fecha es obligatoria.
+        </p>
+      }
+    </div>
+
+    <div class="create-reservation__field">
+      <label for="time" class="create-reservation__label">
+        Hora
+      </label>
+      <input
+        id="time"
+        type="time"
+        class="create-reservation__input"
+        formControlName="time"
+        [attr.aria-required]="true"
+        [attr.aria-invalid]="form.controls.time.invalid && form.controls.time.touched"
+        [attr.aria-describedby]="form.controls.time.invalid && form.controls.time.touched ? 'time-error' : null"
+      />
+      @if (form.controls.time.invalid && form.controls.time.touched) {
+        <p id="time-error" class="create-reservation__error" role="alert">
+          La hora es obligatoria.
+        </p>
+      }
+    </div>
+
+    <div class="create-reservation__field">
+      <label for="service" class="create-reservation__label">
+        Servicio
+      </label>
+      <select
+        id="service"
+        class="create-reservation__select"
+        formControlName="service"
+        [attr.aria-required]="true"
+        [attr.aria-invalid]="form.controls.service.invalid && form.controls.service.touched"
+        [attr.aria-describedby]="form.controls.service.invalid && form.controls.service.touched ? 'service-error' : null"
+      >
+        <option value="" disabled>Seleccione un servicio</option>
+        @for (s of availableServices; track s) {
+          <option [value]="s">{{ s }}</option>
+        }
+      </select>
+      @if (form.controls.service.invalid && form.controls.service.touched) {
+        <p id="service-error" class="create-reservation__error" role="alert">
+          Debe seleccionar un servicio.
+        </p>
+      }
+    </div>
+
+    <div class="create-reservation__actions">
+      <button
+        type="submit"
+        class="create-reservation__submit"
+        [disabled]="submitting()"
+        [attr.aria-busy]="submitting() ? 'true' : null"
+      >
+        {{ submitting() ? 'Guardando…' : 'Crear reserva' }}
+      </button>
+      <a
+        routerLink="/reservas"
+        class="create-reservation__cancel"
+      >
+        Volver al listado
+      </a>
+    </div>
+  </form>
+</section>
