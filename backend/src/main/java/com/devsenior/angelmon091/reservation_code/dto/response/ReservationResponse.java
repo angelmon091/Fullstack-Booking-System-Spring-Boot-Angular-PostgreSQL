@@ -9,8 +9,11 @@ import java.time.LocalTime;
 public record ReservationResponse(
         Long id,
         String customerName,
+        String customerEmail,
+        String customerPhone,
         LocalDate date,
         LocalTime time,
         String service,
+        String internalNotes,
         String status
 ) {}

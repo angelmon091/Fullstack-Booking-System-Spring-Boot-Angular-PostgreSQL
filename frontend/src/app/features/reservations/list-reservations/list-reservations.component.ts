@@ -33,6 +33,7 @@ export class ListReservationsComponent {
   private readonly reservaService = inject(ReservaService);
 
   readonly dateFilter = signal<DateFilter>('all');
+  readonly statusFilter = signal<'active' | 'history'>('active');
   readonly serviceFilter = signal<string>('');
   readonly sortBy = signal<SortBy>('date');
   readonly sortOrder = signal<'asc' | 'desc'>('asc');
@@ -46,17 +47,20 @@ export class ListReservationsComponent {
       tap(() => this.loading.set(true)),
       startWith(undefined),
       switchMap(() =>
-        this.reservaService.getAll().pipe(
+        this.reservaService.getAll(0, 500).pipe( // Fixed size for now, as requested for scaling prep
           tap(() => this.loading.set(false))
         )
       )
     ),
-    { initialValue: [] as ReservationResponse[] }
+    { initialValue: { content: [] } as any }
   );
 
+  readonly reservationsList = computed(() => (this.reservations() as any)?.content || []);
+
   readonly filteredReservations = computed(() => {
-    const list = this.reservations();
+    const list = this.reservationsList();
     const dateF = this.dateFilter();
+    const statusF = this.statusFilter();
     const serviceF = this.serviceFilter();
     const by = this.sortBy();
     const order = this.sortOrder();
@@ -64,16 +68,24 @@ export class ListReservationsComponent {
     const today = this.getTodayString();
     const nextWeekEnd = this.getNextWeekEndString();
 
-    let result = list.filter((r) => {
+    let result = list.filter((r: ReservationResponse) => {
+      // Status filter (Business History Logic)
+      if (statusF === 'active' && (r.status === 'CANCELLED' || r.date < today)) return false;
+      if (statusF === 'history' && r.status === 'ACTIVE' && r.date >= today) return false;
+
+      // Date filter
       if (dateF === 'today' && r.date !== today) return false;
       if (dateF === 'next_week') {
         if (r.date < today || r.date > nextWeekEnd) return false;
       }
+      
+      // Service filter
       if (serviceF && r.service !== serviceF) return false;
+      
       return true;
     });
 
-    result = [...result].sort((a, b) => {
+    result = [...result].sort((a: ReservationResponse, b: ReservationResponse) => {
       let cmp: number;
       if (by === 'date') {
         cmp = a.date === b.date
@@ -90,10 +102,15 @@ export class ListReservationsComponent {
   });
 
   readonly cancellingId = signal<number | null>(null);
+  readonly purgingId = signal<number | null>(null);
   readonly errorMessage = signal<string | null>(null);
 
   setDateFilter(value: DateFilter): void {
     this.dateFilter.set(value);
+  }
+
+  setStatusFilter(value: 'active' | 'history'): void {
+    this.statusFilter.set(value);
   }
 
   setServiceFilter(value: string): void {
@@ -133,6 +150,32 @@ export class ListReservationsComponent {
         this.cancellingId.set(null);
         this.errorMessage.set(
           err?.message ?? err?.error?.message ?? 'Error al cancelar la reserva'
+        );
+      },
+    });
+  }
+
+  /**
+   * Permanently deletes a reservation by id and refreshes the list on success.
+   *
+   * @param id the reservation ID to purge
+   */
+  purgeReservation(id: number): void {
+    if (!confirm('¿Estás seguro de que deseas eliminar permanentemente esta reserva? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    this.errorMessage.set(null);
+    this.purgingId.set(id);
+    this.reservaService.purge(id).subscribe({
+      next: () => {
+        this.purgingId.set(null);
+        this.refresh$.next();
+      },
+      error: (err) => {
+        this.purgingId.set(null);
+        this.errorMessage.set(
+          err?.message ?? err?.error?.message ?? 'Error al eliminar la reserva'
         );
       },
     });

@@ -33,9 +33,12 @@ export class CreateReservationComponent {
 
   readonly form = this.fb.group({
     customerName: this.fb.control('', [Validators.required, Validators.minLength(1)]),
+    customerEmail: this.fb.control('', Validators.email),
+    customerPhone: this.fb.control(''),
     date: this.fb.control('', Validators.required),
     time: this.fb.control('', Validators.required),
     service: this.fb.control('', Validators.required),
+    internalNotes: this.fb.control('', Validators.maxLength(1000)),
   });
 
   /**
@@ -50,9 +53,12 @@ export class CreateReservationComponent {
     const value = this.form.getRawValue();
     const request: CreateReservationRequest = {
       customerName: value.customerName.trim(),
+      customerEmail: value.customerEmail.trim() || undefined,
+      customerPhone: value.customerPhone.trim() || undefined,
       date: value.date,
       time: value.time,
       service: value.service,
+      internalNotes: value.internalNotes.trim() || undefined,
     };
 
     this.toastMessage.set(null);

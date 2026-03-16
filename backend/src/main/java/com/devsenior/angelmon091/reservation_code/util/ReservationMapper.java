@@ -21,9 +21,12 @@ public class ReservationMapper {
     public Reservation toEntity(CreateReservationRequest request) {
         return Reservation.builder()
                 .customerName(request.customerName())
+                .customerEmail(request.customerEmail())
+                .customerPhone(request.customerPhone())
                 .date(request.date())
                 .time(request.time())
                 .service(request.service())
+                .internalNotes(request.internalNotes())
                 .build();
     }
 
@@ -37,9 +40,12 @@ public class ReservationMapper {
         return new ReservationResponse(
                 reservation.getId(),
                 reservation.getCustomerName(),
+                reservation.getCustomerEmail(),
+                reservation.getCustomerPhone(),
                 reservation.getDate(),
                 reservation.getTime(),
                 reservation.getService(),
+                reservation.getInternalNotes(),
                 reservation.getStatus().name()
         );
     }

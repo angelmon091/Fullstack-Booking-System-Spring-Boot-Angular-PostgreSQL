@@ -36,6 +36,12 @@ public class Reservation {
     @Column(name = "customer_name", nullable = false)
     private String customerName;
 
+    @Column(name = "customer_email")
+    private String customerEmail;
+
+    @Column(name = "customer_phone")
+    private String customerPhone;
+
     @Column(nullable = false)
     private LocalDate date;
 
@@ -44,6 +50,9 @@ public class Reservation {
 
     @Column(nullable = false)
     private String service;
+
+    @Column(name = "internal_notes", length = 1000)
+    private String internalNotes;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

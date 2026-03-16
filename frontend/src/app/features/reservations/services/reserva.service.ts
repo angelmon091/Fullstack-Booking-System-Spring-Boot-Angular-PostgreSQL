@@ -8,6 +8,17 @@ import type {
 } from '../models/reservation.model';
 
 /**
+ * Pagination interface matching Spring Data Page.
+ */
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+}
+
+/**
  * Service responsible for reservation API operations.
  * Uses the backend base URL from environment configuration.
  */
@@ -19,12 +30,14 @@ export class ReservaService {
   private readonly baseUrl = `${environment.apiUrl}/reservas`;
 
   /**
-   * Fetches all reservations from the backend.
+   * Fetches a paginated list of reservations from the backend.
    *
-   * @returns Observable of the list of reservations
+   * @param page page number (0-indexed)
+   * @param size number of items per page
+   * @returns Observable of the Page envelope
    */
-  getAll(): Observable<ReservationResponse[]> {
-    return this.http.get<ReservationResponse[]>(this.baseUrl);
+  getAll(page = 0, size = 100): Observable<Page<ReservationResponse>> {
+    return this.http.get<Page<ReservationResponse>>(`${this.baseUrl}?page=${page}&size=${size}`);
   }
 
   /**
@@ -45,5 +58,15 @@ export class ReservaService {
    */
   cancel(id: number): Observable<ReservationResponse> {
     return this.http.delete<ReservationResponse>(`${this.baseUrl}/${id}`);
+  }
+
+  /**
+   * Purges (permanently deletes) a reservation by id.
+   *
+   * @param id the reservation ID
+   * @returns Observable of the result
+   */
+  purge(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}/purge`);
   }
 }

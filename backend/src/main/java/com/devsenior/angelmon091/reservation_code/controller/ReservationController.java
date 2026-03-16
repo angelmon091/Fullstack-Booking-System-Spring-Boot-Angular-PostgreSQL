@@ -5,6 +5,9 @@ import com.devsenior.angelmon091.reservation_code.dto.response.ReservationRespon
 import com.devsenior.angelmon091.reservation_code.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
 
 /**
  * REST controller for reservation management.
@@ -31,13 +33,15 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     /**
-     * Lists all reservations.
+     * Lists all reservations with pagination.
      *
-     * @return list of all reservations (200 OK)
+     * @param pageable pagination parameters (default page 0, size 20, sorted by date)
+     * @return paginated list of reservations (200 OK)
      */
     @GetMapping
-    public ResponseEntity<List<ReservationResponse>> listAll() {
-        List<ReservationResponse> reservations = reservationService.findAll();
+    public ResponseEntity<Page<ReservationResponse>> listAll(
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        Page<ReservationResponse> reservations = reservationService.findAll(pageable);
         return ResponseEntity.ok(reservations);
     }
 
@@ -68,5 +72,17 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> cancel(@PathVariable Long id) {
         ReservationResponse cancelled = reservationService.cancelReservation(id);
         return ResponseEntity.ok(cancelled);
+    }
+
+    /**
+     * Purges (permanently deletes) a reservation by id.
+     *
+     * @param id the reservation ID
+     * @return 204 No Content
+     */
+    @DeleteMapping("/{id}/purge")
+    public ResponseEntity<Void> purge(@PathVariable Long id) {
+        reservationService.deleteReservation(id);
+        return ResponseEntity.noContent().build();
     }
 }

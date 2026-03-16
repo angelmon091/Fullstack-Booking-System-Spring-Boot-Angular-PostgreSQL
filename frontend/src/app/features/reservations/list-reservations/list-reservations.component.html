@@ -5,164 +5,152 @@
   </div>
 
   @if (errorMessage(); as msg) {
-    <div
-      class="list-reservations__error"
-      role="alert"
-      aria-live="polite"
-    >
-      <p>{{ msg }}</p>
-      <button
-        type="button"
-        class="list-reservations__error-dismiss"
-        (click)="clearError()"
-        aria-label="Cerrar mensaje de error"
-      >
-        Cerrar
-      </button>
-    </div>
+  <div class="list-reservations__error" role="alert" aria-live="polite">
+    <p>{{ msg }}</p>
+    <button type="button" class="list-reservations__error-dismiss" (click)="clearError()"
+      aria-label="Cerrar mensaje de error">
+      Cerrar
+    </button>
+  </div>
   }
 
   @if (loading()) {
-    <p class="list-reservations__loading" aria-busy="true">
-      Cargando reservas…
-    </p>
+  <p class="list-reservations__loading" aria-busy="true">
+    Cargando reservas…
+  </p>
   } @else {
-    <div class="list-reservations__filters" role="group" aria-labelledby="filters-heading">
-      <h2 id="filters-heading" class="visually-hidden">Filtros y ordenación</h2>
+  <div class="list-reservations__filters" role="group" aria-labelledby="filters-heading">
+    <h2 id="filters-heading" class="visually-hidden">Filtros y ordenación</h2>
 
-      <div class="list-reservations__date-filters">
-        <span class="list-reservations__filter-label">Ver:</span>
-        <button
-          type="button"
-          class="list-reservations__filter-btn"
-          [class.list-reservations__filter-btn--active]="dateFilter() === 'all'"
-          (click)="setDateFilter('all')"
-          aria-pressed="dateFilter() === 'all'"
-          aria-label="Ver todas las reservas"
-        >
-          Todas
-        </button>
-        <button
-          type="button"
-          class="list-reservations__filter-btn"
-          [class.list-reservations__filter-btn--active]="dateFilter() === 'today'"
-          (click)="setDateFilter('today')"
-          aria-pressed="dateFilter() === 'today'"
-          aria-label="Reservas de hoy"
-        >
-          Hoy
-        </button>
-        <button
-          type="button"
-          class="list-reservations__filter-btn"
-          [class.list-reservations__filter-btn--active]="dateFilter() === 'next_week'"
-          (click)="setDateFilter('next_week')"
-          aria-pressed="dateFilter() === 'next_week'"
-          aria-label="Reservas de los próximos 7 días"
-        >
-          Próximos 7 días
-        </button>
-      </div>
-
-      <div class="list-reservations__service-filter">
-        <label for="filter-service" class="list-reservations__filter-label">Servicio:</label>
-        <select
-          id="filter-service"
-          class="list-reservations__select"
-          [value]="serviceFilter()"
-          (change)="onServiceFilterChange($event)"
-          aria-label="Filtrar por tipo de servicio"
-        >
-          <option value="">Todos los servicios</option>
-          @for (s of availableServices; track s) {
-            <option [value]="s">{{ s }}</option>
-          }
-        </select>
-      </div>
-
-      <div class="list-reservations__sort">
-        <span class="list-reservations__filter-label">Ordenar por:</span>
-        <button
-          type="button"
-          class="list-reservations__filter-btn"
-          [class.list-reservations__filter-btn--active]="sortBy() === 'date'"
-          (click)="setSortBy('date')"
-          aria-pressed="sortBy() === 'date'"
-          aria-label="Ordenar por fecha"
-        >
-          Fecha
-        </button>
-        <button
-          type="button"
-          class="list-reservations__filter-btn"
-          [class.list-reservations__filter-btn--active]="sortBy() === 'service'"
-          (click)="setSortBy('service')"
-          aria-pressed="sortBy() === 'service'"
-          aria-label="Ordenar por servicio"
-        >
-          Servicio
-        </button>
-        <button
-          type="button"
-          class="list-reservations__sort-order"
-          (click)="toggleSortOrder()"
-          [attr.aria-label]="sortOrder() === 'asc' ? 'Orden ascendente (clic para descendente)' : 'Orden descendente (clic para ascendente)'"
-          title="{{ sortOrder() === 'asc' ? 'Ascendente' : 'Descendente' }}"
-        >
-          {{ sortOrder() === 'asc' ? '↑' : '↓' }}
-        </button>
-      </div>
+    <div class="list-reservations__status-filters">
+      <span class="list-reservations__filter-label">Estado:</span>
+      <button type="button" class="list-reservations__filter-btn"
+        [class.list-reservations__filter-btn--active]="statusFilter() === 'active'" (click)="setStatusFilter('active')"
+        aria-label="Ver reservas activas">
+        Activas
+      </button>
+      <button type="button" class="list-reservations__filter-btn"
+        [class.list-reservations__filter-btn--active]="statusFilter() === 'history'"
+        (click)="setStatusFilter('history')" aria-label="Ver historial de reservas">
+        Historial
+      </button>
     </div>
 
-    @if (filteredReservations().length === 0) {
-      <p class="list-reservations__empty">
-        {{ reservations().length === 0 ? 'No hay reservas.' : 'Ninguna reserva coincide con los filtros.' }}
-      </p>
-    } @else {
-      <div class="list-reservations__table-wrapper" role="region" aria-labelledby="reservations-heading">
-        <table class="list-reservations__table">
-          <caption class="list-reservations__caption">
-            Listado de reservas
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col">Cliente</th>
-              <th scope="col">Fecha</th>
-              <th scope="col">Hora</th>
-              <th scope="col">Servicio</th>
-              <th scope="col">Estado</th>
-              <th scope="col">
-                <span class="visually-hidden">Acciones</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (r of filteredReservations(); track r.id) {
-              <tr>
-                <td>{{ r.customerName }}</td>
-                <td>{{ r.date }}</td>
-                <td>{{ r.time }}</td>
-                <td>{{ r.service }}</td>
-                <td>{{ getStatusLabel(r.status) }}</td>
-                <td>
-                  @if (r.status !== 'CANCELLED') {
-                    <button
-                      type="button"
-                      class="list-reservations__btn-cancel"
-                      [disabled]="cancellingId() === r.id"
-                      [attr.aria-busy]="cancellingId() === r.id ? 'true' : null"
-                      [attr.aria-label]="'Cancelar reserva de ' + r.customerName"
-                      (click)="cancelReservation(r.id)"
-                    >
-                      {{ cancellingId() === r.id ? 'Cancelando…' : 'Cancelar' }}
-                    </button>
-                  }
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    }
+    <div class="list-reservations__date-filters">
+      <span class="list-reservations__filter-label">Fecha:</span>
+      <button type="button" class="list-reservations__filter-btn"
+        [class.list-reservations__filter-btn--active]="dateFilter() === 'all'" (click)="setDateFilter('all')"
+        aria-label="Cualquier fecha">
+        Todas
+      </button>
+      <button type="button" class="list-reservations__filter-btn"
+        [class.list-reservations__filter-btn--active]="dateFilter() === 'today'" (click)="setDateFilter('today')"
+        aria-label="Solo hoy">
+        Hoy
+      </button>
+    </div>
+
+    <div class="list-reservations__service-filter">
+      <label for="filter-service" class="list-reservations__filter-label">Servicio:</label>
+      <select id="filter-service" class="list-reservations__select" [value]="serviceFilter()"
+        (change)="onServiceFilterChange($event)" aria-label="Filtrar por tipo de servicio">
+        <option value="">Todos los servicios</option>
+        @for (s of availableServices; track s) {
+        <option [value]="s">{{ s }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="list-reservations__sort">
+      <span class="list-reservations__filter-label">Ordenar por:</span>
+      <button type="button" class="list-reservations__filter-btn"
+        [class.list-reservations__filter-btn--active]="sortBy() === 'date'" (click)="setSortBy('date')"
+        aria-pressed="sortBy() === 'date'" aria-label="Ordenar por fecha">
+        Fecha
+      </button>
+      <button type="button" class="list-reservations__filter-btn"
+        [class.list-reservations__filter-btn--active]="sortBy() === 'service'" (click)="setSortBy('service')"
+        aria-pressed="sortBy() === 'service'" aria-label="Ordenar por servicio">
+        Servicio
+      </button>
+      <button type="button" class="list-reservations__sort-order" (click)="toggleSortOrder()"
+        [attr.aria-label]="sortOrder() === 'asc' ? 'Orden ascendente (clic para descendente)' : 'Orden descendente (clic para ascendente)'"
+        title="{{ sortOrder() === 'asc' ? 'Ascendente' : 'Descendente' }}">
+        {{ sortOrder() === 'asc' ? '↑' : '↓' }}
+      </button>
+    </div>
+  </div>
+
+  @if (filteredReservations().length === 0) {
+  <p class="list-reservations__empty">
+    {{ reservations().length === 0 ? 'No hay reservas.' : 'Ninguna reserva coincide con los filtros.' }}
+  </p>
+  } @else {
+  <div class="list-reservations__table-wrapper" role="region" aria-labelledby="reservations-heading">
+    <table class="list-reservations__table">
+      <caption class="list-reservations__caption">
+        Listado de reservas
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Cliente / Contacto</th>
+          <th scope="col">Fecha / Hora</th>
+          <th scope="col">Servicio</th>
+          <th scope="col">Estado</th>
+          <th scope="col">Notas</th>
+          <th scope="col">
+            <span class="visually-hidden">Acciones</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of filteredReservations(); track r.id) {
+        <tr>
+          <td>
+            <div class="list-reservations__customer-cell">
+              <strong>{{ r.customerName }}</strong>
+              <div class="list-reservations__contact-info">
+                @if (r.customerEmail) { <span>{{ r.customerEmail }}</span> }
+                @if (r.customerPhone) { <span>{{ r.customerPhone }}</span> }
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="list-reservations__datetime-cell">
+              <span>{{ r.date }}</span>
+              <span class="list-reservations__time-sub">{{ r.time }}</span>
+            </div>
+          </td>
+          <td>{{ r.service }}</td>
+          <td>
+            <span class="list-reservations__badge" [attr.data-status]="r.status">
+              {{ getStatusLabel(r.status) }}
+            </span>
+          </td>
+          <td>
+            <div class="list-reservations__notes-cell" [title]="r.internalNotes ?? ''">
+              {{ r.internalNotes || '-' }}
+            </div>
+          </td>
+          <td class="list-reservations__actions-cell">
+            <div class="list-reservations__actions-group">
+              @if (r.status === 'ACTIVE') {
+              <button type="button" class="list-reservations__btn-cancel" [disabled]="cancellingId() === r.id"
+                (click)="cancelReservation(r.id)">
+                {{ cancellingId() === r.id ? '...' : 'Cancelar' }}
+              </button>
+              }
+              <button type="button" class="list-reservations__btn-purge" [disabled]="purgingId() === r.id"
+                (click)="purgeReservation(r.id)" title="Eliminar permanentemente">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }
   }
 </section>

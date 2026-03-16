@@ -8,10 +8,11 @@ import com.devsenior.angelmon091.reservation_code.exception.BusinessRuleViolatio
 import com.devsenior.angelmon091.reservation_code.repository.ReservationRepository;
 import com.devsenior.angelmon091.reservation_code.util.ReservationMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 /**
  * Business logic for reservation management.
@@ -24,15 +25,15 @@ public class ReservationService {
     private final ReservationMapper reservationMapper;
 
     /**
-     * Retrieves all reservations.
+     * Retrieves a paginated list of all reservations.
      *
-     * @return the list of all reservations as response DTOs (may be empty)
+     * @param pageable pagination and sorting information
+     * @return a page of reservation response DTOs
      */
     @Transactional(readOnly = true)
-    public List<ReservationResponse> findAll() {
-        return reservationRepository.findAll().stream()
-                .map(reservationMapper::toResponse)
-                .toList();
+    public Page<ReservationResponse> findAll(Pageable pageable) {
+        return reservationRepository.findAll(pageable)
+                .map(reservationMapper::toResponse);
     }
 
     /**
@@ -72,5 +73,19 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservation = reservationRepository.save(reservation);
         return reservationMapper.toResponse(reservation);
+    }
+
+    /**
+     * Physically deletes a reservation from the system.
+     * This is intended for cleaning up junk or test data.
+     *
+     * @param id the reservation ID
+     */
+    @Transactional
+    public void deleteReservation(Long id) {
+        if (!reservationRepository.existsById(id)) {
+            throw new BusinessRuleViolationException("Reservation with id %d not found".formatted(id));
+        }
+        reservationRepository.deleteById(id);
     }
 }

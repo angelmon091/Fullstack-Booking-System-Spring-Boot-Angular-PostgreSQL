@@ -2,26 +2,9 @@
 
 <header class="app-header" role="banner">
   <div class="app-header__inner">
-    <a routerLink="/reservas" class="app-header__brand" aria-label="Sistema de Reservas - Inicio">
-      Reservas
+    <a routerLink="/reservas" class="app-header__brand" aria-label="Sistema de Gestión de Reservas - Inicio">
+      Sistema de Gestión de Reservas
     </a>
-    <nav class="app-header__nav" aria-label="Navegación principal">
-      <a
-        routerLink="/reservas"
-        routerLinkActive="app-header__link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        class="app-header__link"
-      >
-        Listado
-      </a>
-      <a
-        routerLink="/reservas/nueva"
-        routerLinkActive="app-header__link--active"
-        class="app-header__link"
-      >
-        Nueva reserva
-      </a>
-    </nav>
   </div>
 </header>
 

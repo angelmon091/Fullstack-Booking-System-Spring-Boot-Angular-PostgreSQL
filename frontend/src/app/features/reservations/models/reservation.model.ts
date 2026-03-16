@@ -8,9 +8,12 @@ export type ReservationStatus = 'ACTIVE' | 'CANCELLED';
  */
 export interface CreateReservationRequest {
   customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
   date: string;
   time: string;
   service: string;
+  internalNotes?: string;
 }
 
 /**
@@ -19,9 +22,12 @@ export interface CreateReservationRequest {
 export interface ReservationResponse {
   id: number;
   customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
   date: string;
   time: string;
   service: string;
+  internalNotes?: string;
   status: ReservationStatus;
 }
 

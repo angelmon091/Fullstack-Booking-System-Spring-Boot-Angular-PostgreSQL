@@ -41,6 +41,39 @@
     </div>
 
     <div class="create-reservation__field">
+      <label for="customerEmail" class="create-reservation__label">
+        Correo electrónico (opcional)
+      </label>
+      <input
+        id="customerEmail"
+        type="email"
+        class="create-reservation__input"
+        formControlName="customerEmail"
+        autocomplete="email"
+        [attr.aria-invalid]="form.controls.customerEmail.invalid && form.controls.customerEmail.touched"
+        [attr.aria-describedby]="form.controls.customerEmail.invalid && form.controls.customerEmail.touched ? 'customerEmail-error' : null"
+      />
+      @if (form.controls.customerEmail.invalid && form.controls.customerEmail.touched) {
+        <p id="customerEmail-error" class="create-reservation__error" role="alert">
+          Ingrese un correo válido.
+        </p>
+      }
+    </div>
+
+    <div class="create-reservation__field">
+      <label for="customerPhone" class="create-reservation__label">
+        Teléfono (opcional)
+      </label>
+      <input
+        id="customerPhone"
+        type="tel"
+        class="create-reservation__input"
+        formControlName="customerPhone"
+        autocomplete="tel"
+      />
+    </div>
+
+    <div class="create-reservation__field">
       <label for="date" class="create-reservation__label">
         Fecha
       </label>
@@ -102,6 +135,19 @@
           Debe seleccionar un servicio.
         </p>
       }
+    </div>
+
+    <div class="create-reservation__field">
+      <label for="internalNotes" class="create-reservation__label">
+        Notas internas / Detalles adicionales
+      </label>
+      <textarea
+        id="internalNotes"
+        class="create-reservation__textarea"
+        formControlName="internalNotes"
+        rows="3"
+        placeholder="Información relevante para el negocio..."
+      ></textarea>
     </div>
 
     <div class="create-reservation__actions">
