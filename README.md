@@ -64,6 +64,26 @@ npm install
 npm start
 ```
 
+## Running with Docker
+
+The project is fully containerized using Docker and Docker Compose. This is the easiest way to run the entire stack (Database, Backend, and Frontend) with a single command.
+
+**Prerequisites:**
+- Docker and Docker Compose installed on your machine.
+
+**Steps:**
+1. Clone the repository.
+2. Run the following command in the root directory:
+   ```bash
+   docker compose up --build
+   ```
+3. Access the application:
+   - **Frontend**: http://localhost:4200
+   - **Backend API**: http://localhost:8090/reservas
+   - **Database**: localhost:5432 (User: `a`, Password: `password`, DB: `reservation`)
+
+**Note:** The first time you run this, it will take a few minutes to build the images. Subsequent starts will be much faster.
+
 ## Security and Integrity
 
 - **Generic Exception Shielding**: Prevents internal stack trace leakage.
